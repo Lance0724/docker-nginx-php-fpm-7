@@ -1,35 +1,53 @@
-version: '3'
+version: '3.1'
+
 services:
   mysql:
-    build:
-      context: .
-      dockerfile: .docker/mysql/Dockerfile
-    port:
-      - "3306:3306"
-    volumes:
-      - "/var/lib/mysql:/var/lib/mysql"
-      - "/var/log/mysql:/var/log/mysql"
-  nginx:
-    build:
-      context: .
-      dockerfile: .docker/nginx/Dockerfile
+    image: mysql:5.7.26
     ports:
-      - "80:80"
-    expose:
-      - "80"
-    stdin_open: true
-    tty: true
+      - "3307:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
     volumes:
-      - "/var/lib/mysql:/var/lib/mysql"
-    command: nginx
-  php-fpm:
-    build:
-      context: .
-      dockerfile: .docker/php-fpm/Dockerfile
-    expose:
-      - "9000"
-    volumes:
-      - "./:/opt/app"
-    stdin_open: true
-    tty: true
-    command: php-fpm
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - /var/lib/docker-mysql1:/var/lib/mysql
+      - /var/log/docker-mysql1:/var/log/mysql
+    env_file:
+      - ./mysql/.env.mysql
+    entrypoint: ""
+    command: bash -c "chown -R mysql:mysql /var/log/mysql && exec /entrypoint.sh mysqld"
+
+
+#services:
+#  mysql:
+#    build:
+#      context: .
+#      dockerfile: .docker/mysql/Dockerfile
+#    port:
+#      - "3306:3306"
+#    volumes:
+#      - "/var/lib/mysql:/var/lib/mysql"
+#      - "/var/log/mysql:/var/log/mysql"
+#  nginx:
+#    build:
+#      context: .
+#      dockerfile: .docker/nginx/Dockerfile
+#    ports:
+#      - "80:80"
+#    expose:
+#      - "80"
+#    stdin_open: true
+#    tty: true
+#    volumes:
+#      - "/var/lib/mysql:/var/lib/mysql"
+#    command: nginx
+#  php-fpm:
+#    build:
+#      context: .
+#      dockerfile: .docker/php-fpm/Dockerfile
+#    expose:
+#      - "9000"
+#    volumes:
+#      - "./:/opt/app"
+#    stdin_open: true
+#    tty: true
+#    command: php-fpm
