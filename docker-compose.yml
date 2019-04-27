@@ -1,5 +1,13 @@
 version: '3'
 services:
+  mysql:
+    build:
+      context: .
+      dockerfile: .docker/mysql/Dockerfile
+    port:
+      - "3306:3306"
+    volumes:
+      - "/var/lib/mysql:/var/lib/mysql"
   nginx:
     build:
       context: .
@@ -11,7 +19,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - "./:/opt/app"
+      - "/var/lib/mysql:/var/lib/mysql"
     command: nginx
   php-fpm:
     build:
